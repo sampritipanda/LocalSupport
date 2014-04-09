@@ -1,8 +1,7 @@
 class JobsController < ApplicationController
-  # GET /jobs
-  # GET /jobs.json
   def index
-    @jobs = Job.all
+    @organization = Organization.find(params[:organization_id])
+    @jobs = @organization.jobs
 
     respond_to do |format|
       format.html # index.html.erb
@@ -10,10 +9,9 @@ class JobsController < ApplicationController
     end
   end
 
-  # GET /jobs/1
-  # GET /jobs/1.json
   def show
-    @job = Job.find(params[:id])
+    @organization = Organization.find(params[:organization_id])
+    @job = @organization.jobs.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
@@ -21,10 +19,9 @@ class JobsController < ApplicationController
     end
   end
 
-  # GET /jobs/new
-  # GET /jobs/new.json
   def new
-    @job = Job.new
+    @organization = Organization.find(params[:organization_id])
+    @job = @organization.jobs.new
 
     respond_to do |format|
       format.html # new.html.erb
@@ -32,15 +29,14 @@ class JobsController < ApplicationController
     end
   end
 
-  # GET /jobs/1/edit
   def edit
-    @job = Job.find(params[:id])
+    @organization = Organization.find(params[:organization_id])
+    @job = @organization.jobs.find(params[:id])
   end
 
-  # POST /jobs
-  # POST /jobs.json
   def create
-    @job = Job.new(params[:job])
+    @organization = Organization.find(params[:organization_id])
+    @job = @organization.jobs.new(params[:job])
 
     respond_to do |format|
       if @job.save
@@ -53,10 +49,9 @@ class JobsController < ApplicationController
     end
   end
 
-  # PUT /jobs/1
-  # PUT /jobs/1.json
   def update
-    @job = Job.find(params[:id])
+    @organization = Organization.find(params[:organization_id])
+    @job = @organization.jobs.find(params[:id])
 
     respond_to do |format|
       if @job.update_attributes(params[:job])
@@ -69,10 +64,9 @@ class JobsController < ApplicationController
     end
   end
 
-  # DELETE /jobs/1
-  # DELETE /jobs/1.json
   def destroy
-    @job = Job.find(params[:id])
+    @organization = Organization.find(params[:organization_id])
+    @job = @organization.jobs.find(params[:id])
     @job.destroy
 
     respond_to do |format|

@@ -15,13 +15,13 @@
     <td><%= job.title %></td>
     <td><%= job.description %></td>
     <td><%= job.organization %></td>
-    <td><%= link_to 'Show', job %></td>
-    <td><%= link_to 'Edit', edit_job_path(job) %></td>
-    <td><%= link_to 'Destroy', job, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+    <td><%= link_to 'Show', organization_job_path(@organization, job) %></td>
+    <td><%= link_to 'Edit', edit_organization_job_path(@organization, job) %></td>
+    <td><%= link_to 'Destroy', organization_job_path(@organization, job), method: :delete, data: { confirm: 'Are you sure?' } %></td>
   </tr>
 <% end %>
 </table>
 
 <br />
 
-<%= link_to 'New Job', new_job_path %>
+<%= link_to 'New Job', new_organization_job_path(@organization) %>
