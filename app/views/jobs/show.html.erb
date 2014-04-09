@@ -10,11 +10,6 @@
   <%= @job.description %>
 </p>
 
-<p>
-  <b>Organization:</b>
-  <%= @job.organization %>
-</p>
 
-
-<%= link_to 'Edit', edit_organization_job_path(@organization, @job) %> |
-<%= link_to 'Back', organization_jobs_path(@organization) %>
+<%= link_to 'Edit', edit_organization_job_path(@job.organization, @job) %> |
+<%= link_to 'Back', organization_jobs_path(@job.organization) %>
