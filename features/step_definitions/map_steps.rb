@@ -5,7 +5,7 @@ Then /^I should see hyperlinks for "(.*?)", "(.*?)" and "(.*?)" in the map$/ do 
   [org1,org2,org3].each do |org|
     match = page.html.match %Q<{\\"description\\":\\".*>#{org.name}</a>.*\\",\\"lat\\":((?:-|)\\d+\.\\d+),\\"lng\\":((?:-|)\\d+\.\\d+)}>
     expect(match).not_to be_nil
-    # the following might jobs if we were actually running all the gmaps js
+    # the following might work if we were actually running all the gmaps js
     #expect(page).to have_xpath("//div[@class='map_container']//a[@href='#{organization_path(org)}']")
   end
 end
