@@ -14,4 +14,4 @@ Feature: Org admin creating a volunteer work opportunity
 
   Scenario:
     Given I am on the charity page for "Friendly"
-    And I visit the create work page
+    And I visit the create jobs page
