@@ -22,6 +22,7 @@ Then /^I visit the (.*) page$/ do |location|
     when "without users" then visit organizations_report_path
     when "all users" then visit users_report_path
     when "invited users" then visit invited_users_report_path
+    when "create work" then visit new_work_path
     else raise "No matching path found for #{location}!"
   end
 end
@@ -39,6 +40,7 @@ Then /^I should be on the (.*) page$/ do |location|
   when "without users" then current_path.should == organizations_report_path
   when "all users" then current_path.should == users_report_path
   when "invited users" then current_path.should == invited_users_report_path
+  when "create work" then current_path.should == new_work_path
   else raise "No matching path found for #{location}!"
   end
 end
