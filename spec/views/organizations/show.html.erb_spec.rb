@@ -102,7 +102,7 @@ describe 'organizations/show.html.erb' do
 
   describe 'this is my organization button' do
     context 'logged in user' do
-      let(:user) { stub_model User, :id => 2 }
+      let(:user) { stub_model User, :id => 2, :org_admin? => false }
       it 'renders grab button if grabbable true' do
         @grabbable = assign(:grabbable, true)
         view.stub(:current_user).and_return(user)
