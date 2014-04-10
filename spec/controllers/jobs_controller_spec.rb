@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 describe JobsController do
-  let(:user) { double :user }
-  let(:org) { double :organization, id: '1' }
-  let(:job) { double :job, id: '9' }
+  let(:user) { stub_model User }
+  let(:org) { stub_model Organization, id: '1' }
+  let(:job) { stub_model Job, id: '9' }
   let(:jobs_collection) { double :jobs_collection }
   before do
     org.stub jobs: jobs_collection
@@ -95,6 +95,15 @@ describe JobsController do
   end
 
   describe 'POST create' do
+    let(:valid_attributes) { {title: 'hard work', description: 'for the willing'} }
+    let(:invalid_attributes) { {title: 'hard work'} }
+
+    before do
+      controller.stub current_user: user, org_owner?: true
+      org.stub job: jobs_collection
+      jobs_collection.stub build: job
+    end
+
     describe 'with valid params' do
       # TODO make this to a request spec
       # it 'creates a new Job' do
@@ -102,12 +111,6 @@ describe JobsController do
       #     post :create, {:job => valid_attributes}, valid_session
       #   }.to change(Job, :count).by(1)
       # end
-      let(:valid_attributes) { {title: 'hard work', description: 'for the willing'} }
-      before do
-        controller.stub current_user: user, org_owner?: true
-        org.stub job: jobs_collection
-        jobs_collection.stub build: job
-      end
 
       it 'assigns a newly created job as @job' do
         job.should_receive :save
@@ -118,24 +121,36 @@ describe JobsController do
       it 'redirects to the created job' do
         job.stub save: true
         post :create, { organization_id: org.id, job: valid_attributes }
-        response.should redirect_to(Job.last)
+        response.should redirect_to([org, job])
       end
+
     end
 
     describe 'with invalid params' do
       it 'assigns a newly created but unsaved job as @job' do
-        # Trigger the behavior that occurs when invalid params are submitted
         Job.any_instance.stub(:save).and_return(false)
-        post :create, {:job => {'title' => 'invalid value'}}, valid_session
-        assigns(:job).should be_a_new(Job)
+        post :create, {organization_id: org.id, job: invalid_attributes}
+        assigns(:job).should eq job
       end
 
       it 're-renders the "new" template' do
-        # Trigger the behavior that occurs when invalid params are submitted
         Job.any_instance.stub(:save).and_return(false)
-        post :create, {:job => {'title' => 'invalid value'}}, valid_session
+        post :create, {organization_id: org.id, job: invalid_attributes}
         response.should render_template('new')
       end
+    end
+
+    it 'non-org-owners denied' do
+      controller.stub org_owner?: false
+      post :create, { organization_id: org.id, job: valid_attributes }
+      response.status.should eq 302
+    end
+
+    it 'mutation-proofing' do
+      Organization.should_receive(:find).with(org.id.to_s) { org }
+      org.should_receive(:jobs) { jobs_collection }
+      jobs_collection.should_receive(:build)
+      post :create, { organization_id: org.id, job: valid_attributes }
     end
   end
 
