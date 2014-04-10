@@ -1,11 +1,16 @@
 require 'spec_helper'
 
 describe JobsController do
-  let(:user) { double :user, organization: org }
-  let(:org) { double :organization, id: '1', jobs: jobs_collection }
+  let(:user) { double :user }
+  let(:org) { double :organization, id: '1' }
   let(:job) { double :job, id: '9' }
-  let(:jobs_collection) { double :jobs_collection, find: job }
-  before { Organization.stub find: org }
+  let(:jobs_collection) { double :jobs_collection }
+  before do
+    org.stub jobs: jobs_collection
+    job.stub organization: org
+    jobs_collection.stub find: job
+    Organization.stub find: org
+  end
 
   describe 'GET index' do
     it 'assigns all jobs as @jobs' do
@@ -46,11 +51,11 @@ describe JobsController do
     before do
       controller.stub current_user: user, org_owner?: true
       org.stub job: jobs_collection
-      jobs_collection.stub build: Job.new(organization_id: org.id)
+      jobs_collection.stub build: job
     end
     it 'assigns a new job as @job' do
       get :new, { organization_id: org.id }
-      assigns(:job).should be_a_new(Job)
+      assigns(:job).should eq job
     end
     it 'non-org-owners denied' do
       controller.stub org_owner?: false
@@ -91,20 +96,28 @@ describe JobsController do
 
   describe 'POST create' do
     describe 'with valid params' do
-      it 'creates a new Job' do
-        expect {
-          post :create, {:job => valid_attributes}, valid_session
-        }.to change(Job, :count).by(1)
+      # TODO make this to a request spec
+      # it 'creates a new Job' do
+      #   expect {
+      #     post :create, {:job => valid_attributes}, valid_session
+      #   }.to change(Job, :count).by(1)
+      # end
+      let(:valid_attributes) { {title: 'hard work', description: 'for the willing'} }
+      before do
+        controller.stub current_user: user, org_owner?: true
+        org.stub job: jobs_collection
+        jobs_collection.stub build: job
       end
 
       it 'assigns a newly created job as @job' do
-        post :create, {:job => valid_attributes}, valid_session
-        assigns(:job).should be_a(Job)
-        assigns(:job).should be_persisted
+        job.should_receive :save
+        post :create, { organization_id: org.id, job: valid_attributes }
+        assigns(:job).should eq job
       end
 
       it 'redirects to the created job' do
-        post :create, {:job => valid_attributes}, valid_session
+        job.stub save: true
+        post :create, { organization_id: org.id, job: valid_attributes }
         response.should redirect_to(Job.last)
       end
     end
