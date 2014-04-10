@@ -8,15 +8,14 @@ describe JobsController do
   before { Organization.stub find: org }
 
   describe 'GET index' do
-    it 'non-org-owners allowed' do
-      user.stub organization: nil
-      controller.stub current_user: user
-      get :index, { organization_id: org.id }
-      response.status.should eq 200
-    end
     it 'assigns all jobs as @jobs' do
       get :index, { organization_id: org.id }
       assigns(:jobs).should eq jobs_collection
+    end
+    it 'non-org-owners allowed' do
+      controller.stub current_user: user, org_owner?: false
+      get :index, { organization_id: org.id }
+      response.status.should eq 200
     end
     it 'mutation-proofing' do
       Organization.should_receive(:find).with(org.id) { org }
@@ -30,10 +29,23 @@ describe JobsController do
       get :show, { organization_id: org.id, id: job.id }
       assigns(:job).should eq job
     end
+    it 'non-org-owners allowed' do
+      controller.stub current_user: user, org_owner?: false
+      get :show, { organization_id: org.id, id: job.id }
+      response.status.should eq 200
+    end
+    it 'mutation-proofing' do
+      Organization.should_receive(:find).with(org.id) { org }
+      org.should_receive(:jobs) { jobs_collection }
+      jobs_collection.should_receive(:find)
+      get :show, { organization_id: org.id, id: job.id }
+    end
   end
 
   describe 'GET new' do
     it 'assigns a new job as @job' do
+      org.stub(:)
+
       get :new, { organization_id: org.id }
       assigns(:job).should be_a_new(Job)
     end
