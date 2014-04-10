@@ -323,7 +323,7 @@ describe OrganizationsController do
 
     context "while signed in as non-admin" do
       before(:each) do
-        make_current_user_nonadmin.should_receive(:admin?).and_return(false)
+        make_current_user_non_admin.should_receive(:admin?).and_return(false)
       end
 
       describe "with valid params" do
@@ -448,7 +448,7 @@ describe OrganizationsController do
     end
     context "while signed in as non-admin", :helpers => :controllers do
       before(:each) do
-        make_current_user_nonadmin
+        make_current_user_non_admin
       end
       it "does not destroy the requested organization but redirects to organization home page" do
         double = double_organization

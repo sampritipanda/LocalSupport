@@ -3,19 +3,19 @@ describe UserReportsController do
   describe 'PUT update user-organization status', :helpers => :controllers do
     before(:each) do
       make_current_user_admin
-      @nonadmin_user = double("User")
-      User.stub(:find_by_id).with("4").and_return(@nonadmin_user)
-      @nonadmin_user.stub(:pending_organization_id=).with('5')
-      @nonadmin_user.stub(:save!)
+      @non_admin_user = double("User")
+      User.stub(:find_by_id).with("4").and_return(@non_admin_user)
+      @non_admin_user.stub(:pending_organization_id=).with('5')
+      @non_admin_user.stub(:save!)
       @org = double("Organization")
       @org.stub(:name).and_return('Red Cross')
       Organization.stub(:find).and_return(@org)
     end
     context 'user requesting pending status to be admin of charity' do
       before do 
-        @nonadmin_user.stub(:request_admin_status)
-        @nonadmin_user.stub(:promote_to_org_admin)
-        @nonadmin_user.stub(:email)
+        @non_admin_user.stub(:request_admin_status)
+        @non_admin_user.stub(:promote_to_org_admin)
+        @non_admin_user.stub(:email)
       end
 
       it 'should redirect to the show page for nested org' do
@@ -29,12 +29,12 @@ describe UserReportsController do
     end
     context 'admin promoting user to charity admin' do
       before(:each) do
-        @nonadmin_user.stub(:promote_to_org_admin)
-        @nonadmin_user.stub(:email).and_return('stuff@stuff.com')
+        @non_admin_user.stub(:promote_to_org_admin)
+        @non_admin_user.stub(:email).and_return('stuff@stuff.com')
       end
       it 'non-admins get refused' do
-        @nonadmin_user.stub(:admin?).and_return(false)
-        controller.stub(:current_user).and_return(@nonadmin_user)
+        @non_admin_user.stub(:admin?).and_return(false)
+        controller.stub(:current_user).and_return(@non_admin_user)
         put :update, {:id => '4'}
         response.response_code.should == 404
       end
@@ -45,7 +45,7 @@ describe UserReportsController do
       end
       it 'shows a flash telling which user got approved' do
         put :update, {:id => '4'}
-        expect(flash[:notice]).to have_content("You have approved #{@nonadmin_user.email}.")
+        expect(flash[:notice]).to have_content("You have approved #{@non_admin_user.email}.")
       end
     end
   end
@@ -77,7 +77,7 @@ describe UserReportsController do
 
       context "as non-admin" do
         before(:each) do
-          make_current_user_nonadmin
+          make_current_user_non_admin
         end
 
         it "redirects user to root and flashes a notice" do
@@ -125,7 +125,7 @@ describe UserReportsController do
     end
 
     it 'is for admins only' do
-      make_current_user_nonadmin
+      make_current_user_non_admin
       get :invited
       response.should redirect_to root_path
     end

@@ -36,7 +36,7 @@ describe ApplicationController, :helpers => :controllers do
   end
 
   it '#after_sign_in_path_for' do
-    user = make_current_user_nonadmin
+    user = make_current_user_non_admin
     user.stub :organization => nil
 
     controller.after_sign_in_path_for(user).should eq '/'
@@ -49,7 +49,7 @@ describe ApplicationController, :helpers => :controllers do
   end
 
   it '#after_accept_path_for' do
-    user = make_current_user_nonadmin
+    user = make_current_user_non_admin
     user.stub :organization => nil
 
     controller.after_accept_path_for(user).should eq '/'

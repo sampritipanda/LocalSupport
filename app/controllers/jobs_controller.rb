@@ -1,4 +1,6 @@
 class JobsController < ApplicationController
+  before_filter :authorize, :except => [:index, :show]
+
   # GET organizations/1/jobs
   # GET organizations/1/jobs.json
   def index
@@ -86,5 +88,19 @@ class JobsController < ApplicationController
       format.html { redirect_to organization_jobs_url(organization) }
       format.json { head :ok }
     end
+  end
+
+  private
+
+  def authorize
+    unless org_owner?
+      flash[:error] = 'You must be signed in as an organization owner to perform this action!'
+      redirect_to '/'
+      false
+    end
+  end
+
+  def org_owner?
+    #
   end
 end
