@@ -67,10 +67,25 @@ describe JobsController do
   end
 
   describe 'GET edit' do
+    before do
+      controller.stub current_user: user, org_owner?: true
+      org.stub jobs: jobs_collection
+      jobs_collection.stub find: job
+    end
     it 'assigns the requested job as @job' do
-      job = Job.create! valid_attributes
-      get :edit, {:id => job.to_param}, valid_session
+      get :edit, {organization_id: org.id, :id => job.id}
       assigns(:job).should eq(job)
+    end
+    it 'non-org-owners denied' do
+      controller.stub org_owner?: false
+      get :edit, {organization_id: org.id, :id => job.id}
+      response.status.should eq 302
+    end
+    it 'mutation-proofing' do
+      Organization.should_receive(:find).with(org.id) { org }
+      org.should_receive(:jobs) { jobs_collection }
+      jobs_collection.should_receive(:find)
+      get :edit, {organization_id: org.id, :id => job.id}
     end
   end
 
