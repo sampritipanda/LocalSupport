@@ -43,12 +43,27 @@ describe JobsController do
   end
 
   describe 'GET new' do
+    before do
+      controller.stub current_user: user, org_owner?: true
+      org.stub job: jobs_collection
+      jobs_collection.stub build: Job.new(organization_id: org.id)
+    end
     it 'assigns a new job as @job' do
-      org.stub(:)
-
       get :new, { organization_id: org.id }
       assigns(:job).should be_a_new(Job)
     end
+    it 'non-org-owners denied' do
+      controller.stub org_owner?: false
+      get :new, { organization_id: org.id }
+      response.status.should eq 302
+    end
+    it 'mutation-proofing' do
+      Organization.should_receive(:find).with(org.id) { org }
+      org.should_receive(:jobs) { jobs_collection }
+      jobs_collection.should_receive(:build)
+      get :new, { organization_id: org.id }
+    end
+
   end
 
   describe 'GET edit' do
