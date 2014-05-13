@@ -141,6 +141,25 @@ describe 'organizations/show.html.erb' do
       render
       rendered.should_not have_link 'Create a Volunteer Opportunity', :href => new_volunteer_op_path
     end
+
+    it 'is shown when feature is active' do
+      assign(:can_create_volunteer_op, true)
+      expect(view).to receive(:feature_active?).
+        with(:volunteer_ops).and_return(true)
+      render
+      expect(rendered).to have_link \
+        'Create a Volunteer Opportunity', :href => new_volunteer_op_path      
+    end
+
+    it 'is not visible when feature is inactive' do
+      assign(:can_create_volunteer_op, true)
+      expect(view).to receive(:feature_active?).
+        with(:volunteer_ops).and_return(false)
+      render
+      expect(rendered).not_to have_link \
+        'Create a Volunteer Opportunity', :href => new_volunteer_op_path
+    end
+
   end
 end
 
